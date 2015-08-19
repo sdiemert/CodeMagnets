@@ -16,16 +16,14 @@ from os import listdir
 pp = pprint.PrettyPrinter(indent=4)
 
 class CodeMagnetsImageProcessor:
-
     def __init__(self):
         pass
 
-    def train(self, file=True, path="./training3/"):
+    def train(self, readFromFile=True, path="./training3/"):
         """
         train the image processor
         :return: True if the training succeeds, false otherwise.
         """
-
         self.knn = ColorKnnClassifier()
 
         self.ratioKnns = []
@@ -33,28 +31,47 @@ class CodeMagnetsImageProcessor:
         for i in range(7):
             self.ratioKnns.append(LetterKnnClassifier())
 
-        print self.ratioKnns
+        if readFromFile:
+            f = open(path, 'r')
 
-        fs = listdir(path)
+            for l in f:
+                l = l.split(",")
+                x = [float(i) for i in l[1:]]
+                self.ratioKnns[cc.getColorFromId(int(l[0]))].train.append((int(l[0]), x))
 
-        for f in fs:
-            s = f.split(".")
-            if len(s) < 2:
-                continue
+            f.close()
 
-            s = f.split("_")
-            if len(s) < 2:
-                continue
+            f = open("color_data.csv",'r')
 
-            c1 = const.getConstantFromString(s[0])
+            for l in f:
+                l = l.split(',')
+                x = [float(i) for i in l[1:]]
+                self.knn.train.append((int(l[0]), x))
 
-            c2 = cc.getColorFromId(c1)
+        else:
+            print self.ratioKnns
 
-            if c2 is not None:
-                self.ratioKnns[c2].loadTrainingImage(path+f, c1)
-                print "LetterClass. "+str(c2)+":"+str(cc.getColorFromNumber(c2))+" trained: "+f+ " as "+str(const.getStringFromNumber(c1))
+            fs = listdir(path)
 
-        self.knn.populateData()
+            for f in fs:
+                s = f.split(".")
+                if len(s) < 2:
+                    continue
+
+                s = f.split("_")
+                if len(s) < 2:
+                    continue
+
+                c1 = const.getConstantFromString(s[0])
+
+                c2 = cc.getColorFromId(c1)
+
+                if c2 is not None:
+                    self.ratioKnns[c2].loadTrainingImage(path + f, c1)
+                    print "LetterClass. " + str(c2) + ":" + str(
+                        cc.getColorFromNumber(c2)) + " trained: " + f + " as " + str(const.getStringFromNumber(c1))
+
+        #self.knn.populateData()
         self.knn.trainModel()
 
         for r in self.ratioKnns:

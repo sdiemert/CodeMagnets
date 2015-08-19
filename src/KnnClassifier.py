@@ -13,6 +13,9 @@ class KnnClassifier:
         self.train = [];
         self.knn = cv2.KNearest()
 
+    def get_training_data(self):
+        return self.train
+
     def populateData(self):
 
         path = "./training2/"

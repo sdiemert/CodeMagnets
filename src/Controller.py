@@ -9,7 +9,7 @@ class Controller:
         self.image_path = path
 
         self.processor = CodeMagnetsImageProcessor()
-        self.processor.train()
+        self.processor.train(readFromFile=True, path="data.csv")
 
     def set_view(self, v):
         self.view = v

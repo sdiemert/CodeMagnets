@@ -33,10 +33,7 @@ class ColorKnnClassifier(KnnClassifier):
                 continue
 
             c = const.getConstantFromString(s[0])
-
-            
-            c = cc.getColorFromId(c) 
-           
+            c = cc.getColorFromId(c)
 
             if c is not None:
                 self.loadTrainingImage(path+f, c)
@@ -70,9 +67,6 @@ class ColorKnnClassifier(KnnClassifier):
             plt.imshow(image)
             plt.show()
         return r 
-
-
-
 
     def getData(self, vals):
         
@@ -113,7 +107,7 @@ class ColorKnnClassifier(KnnClassifier):
         s = vals.shape
         s = s[0]*s[1]
 
-        count = 0; 
+        count = 0
 
         if s == 0:
             return [0]

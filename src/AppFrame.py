@@ -109,6 +109,5 @@ class AppFrame(wx.Frame):
         self.output.AppendText(m+"\n")
 
     def show_code(self, code):
-
         for l in code:
             self.println(" ".join(l))
