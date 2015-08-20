@@ -15,6 +15,7 @@ from os import listdir
 
 pp = pprint.PrettyPrinter(indent=4)
 
+
 class CodeMagnetsImageProcessor:
     def __init__(self):
         pass
@@ -41,16 +42,16 @@ class CodeMagnetsImageProcessor:
 
             f.close()
 
-            f = open("color_data.csv",'r')
+            f = open("color_data.csv", 'r')
 
             for l in f:
                 l = l.split(',')
                 x = [float(i) for i in l[1:]]
                 self.knn.train.append((int(l[0]), x))
 
-        else:
-            print self.ratioKnns
+            f.close()
 
+        else:
             fs = listdir(path)
 
             for f in fs:
@@ -71,7 +72,6 @@ class CodeMagnetsImageProcessor:
                     print "LetterClass. " + str(c2) + ":" + str(
                         cc.getColorFromNumber(c2)) + " trained: " + f + " as " + str(const.getStringFromNumber(c1))
 
-        #self.knn.populateData()
         self.knn.trainModel()
 
         for r in self.ratioKnns:

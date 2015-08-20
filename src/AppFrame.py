@@ -20,31 +20,48 @@ class AppFrame(wx.Frame):
         control = wx.BoxSizer(wx.HORIZONTAL)
         content = wx.BoxSizer(wx.HORIZONTAL)
 
+        output_wrapper = wx.BoxSizer(wx.VERTICAL)
+
         img = wx.EmptyImage(400, 400)
+
         self.image_1 = wx.StaticBitmap(self.display, wx.ID_ANY, wx.BitmapFromImage(img))
-        self.output = wx.TextCtrl(self.display, wx.ID_ANY, size=(400, 400), style=wx.TE_MULTILINE)
-        self.browse_button = wx.Button(self.display, wx.ID_ANY, label="Browser for File")
+        self.output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 198), style=wx.TE_MULTILINE)
+        self.code_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 198), style=wx.TE_MULTILINE)
+        self.result_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 400), style=wx.TE_MULTILINE)
+        self.browse_button = wx.Button(self.display, wx.ID_ANY, label="Browse for Image")
         self.analysis_button = wx.Button(self.display, wx.ID_ANY, label="Analyze Image")
         self.execute_button = wx.Button(self.display, wx.ID_ANY, label="Execute Code!")
+        self.cancel_button = wx.Button(self.display, wx.ID_ANY, label="Cancel")
 
         self.browse_button.Bind(wx.EVT_BUTTON, self.on_browse)
         self.analysis_button.Bind(wx.EVT_BUTTON, self.on_analysis)
         self.execute_button.Bind(wx.EVT_BUTTON, self.on_execute)
+        self.cancel_button.Bind(wx.EVT_BUTTON, self.on_cancel)
 
         self.output.Disable()
+        self.code_output.Disable()
+        self.result_output.Disable()
+
+        output_wrapper.Add(self.output)
+        output_wrapper.Add(self.code_output)
 
         content.Add(self.image_1, 0, wx.ALL, 5)
-        content.Add(self.output, 0, wx.ALL, 5)
+        content.Add(output_wrapper, 0, wx.ALL, 5)
+        content.Add(self.result_output, 0, wx.ALL, 5)
 
         control.Add(self.browse_button, 0, wx.ALL, 5)
         control.Add(self.analysis_button, 0, wx.ALL, 5)
         control.Add(self.execute_button, 0, wx.ALL, 5)
+        control.Add(self.cancel_button, 0, wx.ALL, 5)
 
         wrapper.Add(control, 0, wx.ALL, 5)
         wrapper.Add(content, 0, wx.ALL, 5)
 
         self.display.SetSizer(wrapper)
         wrapper.Fit(self)
+
+        self.analysis_button.Disable()
+        self.execute_button.Disable()
 
         self.CreateStatusBar()
 
@@ -87,15 +104,26 @@ class AppFrame(wx.Frame):
 
         self.image_1.SetBitmap(wx.BitmapFromImage(img))
         self.set_image_path(filepath)
+        self.analysis_button.Enable()
+        self.execute_button.Disable()
         self.display.Refresh()
 
     def on_analysis(self, event):
         print "Analysis!"
         self.controller.process()
+        self.output.Enable()
+        self.execute_button.Enable()
 
     def on_execute(self, event):
         print "Execute!"
-        pass
+        self.code_output.SetValue(self.controller.execute())
+
+    def on_cancel(self, event):
+        print "Cancel!"
+        self.output.Clear()
+        self.image_1.SetBitmap(wx.BitmapFromImage(wx.EmptyImage(400, 400)))
+        self.output.Disable()
+        self.display.Refresh()
 
     def set_controller(self, c):
         self.controller = c
@@ -111,3 +139,7 @@ class AppFrame(wx.Frame):
     def show_code(self, code):
         for l in code:
             self.println(" ".join(l))
+
+    def get_output_text(self):
+        x = self.output.GetValue()
+        return x.split("\n")
