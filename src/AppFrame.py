@@ -92,6 +92,16 @@ class AppFrame(wx.Frame):
             self.on_view(dialog.GetPath())
         dialog.Destroy()
 
+        self.analysis_button.Enable()
+        self.generate_button.Disable()
+        self.execute_button.Disable()
+        self.code_output.Disable()
+        self.result_output.Disable()
+        self.code_output.Clear()
+        self.result_output.Clear()
+        self.output.Clear()
+        self.output.Disable()
+
     def on_view(self, filepath):
         print "Browse!"
         img = wx.Image(filepath, wx.BITMAP_TYPE_ANY)

@@ -3,7 +3,6 @@ __author__ = 'sdiemert'
 from statements.Statements import *
 
 class CodeGenerator:
-
     def __init__(self):
         pass
 
@@ -31,12 +30,14 @@ class CodeGenerator:
 
         for l in x:
 
-            s = self.get_statement(l)
+            s = self.get_statement(l, depth=len(depth))
 
             if not s:
                 continue
 
             statement_type = s.__class__.__name__
+
+            print statement_type, len(depth)
 
             if len(depth) == 0:
                 prog.append(s)
@@ -62,36 +63,51 @@ class CodeGenerator:
                 x = st.get_code()
                 s += str(x)
             except:
-                print "failed on: "+str(st)
+                print "failed on: " + str(st)
 
         s = s.replace("plus", "+")
+        s = s.replace("minus", "-")
         s = s.replace("lt", "<")
         s = s.replace("gt", ">")
+        s = s.replace("mod", "%")
+        s = s.replace("eequals", "==")
+        s = s.replace("equals", "=")
+        s = s.replace("zero", "0")
+        s = s.replace("one", "1")
+        s = s.replace("two", "2")
+        s = s.replace("ten", "10")
 
         return s
 
-    def get_statement(self, statement):
+    def get_statement(self, statement, depth=0):
 
         s = statement.split(" ")
 
         # check the first word of the statement
 
         if s[0] == "VAR" and s[2] == "EQUALS":
-            return Declaration(s[1], s[3])
+            return Declaration(s[1], s[3], depth=depth)
 
         elif s[0] == "LOOP":
             if len(s) > 2:
-                return Loop(s[1:])
+                return Loop(s[1:], depth=depth)
 
         elif s[0] == "PRINT":
             if len(s) > 1:
-                return Print(s[1:])
+                return Print(s[1:], depth=depth)
 
         elif (s[0] == "X" or s[0] == "Y") and s[1] == "EQUALS":
-            return Assignment(s[0], s[2:])
+            return Assignment(s[0], s[2:], depth=depth)
 
         elif s[0] == "IF":
-            return If(s[2:])
+            return If(s[1:], depth=depth)
 
         elif s[0] == "ENDLOOP" or s[0] == "ENDIF":
             return EndBlock(s[0])
+
+
+if __name__ == "__main__":
+    s = "START\nVAR X EQUALS 0\nLOOP X LT 10\nIF X MOD 2 LT 0\nPRINT X\nENDIF\nX EQUALS X PLUS 1\nENDLOOP\nSTOP"
+    print s
+    c = CodeGenerator()
+    print c.get_code(s.split("\n"))
