@@ -30,11 +30,13 @@ class AppFrame(wx.Frame):
         self.result_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 400), style=wx.TE_MULTILINE)
         self.browse_button = wx.Button(self.display, wx.ID_ANY, label="Browse for Image")
         self.analysis_button = wx.Button(self.display, wx.ID_ANY, label="Analyze Image")
-        self.execute_button = wx.Button(self.display, wx.ID_ANY, label="Execute Code!")
+        self.generate_button = wx.Button(self.display, wx.ID_ANY, label="Generate Code")
+        self.execute_button = wx.Button(self.display, wx.ID_ANY, label="Execute!")
         self.cancel_button = wx.Button(self.display, wx.ID_ANY, label="Cancel")
 
         self.browse_button.Bind(wx.EVT_BUTTON, self.on_browse)
         self.analysis_button.Bind(wx.EVT_BUTTON, self.on_analysis)
+        self.generate_button.Bind(wx.EVT_BUTTON, self.on_generate)
         self.execute_button.Bind(wx.EVT_BUTTON, self.on_execute)
         self.cancel_button.Bind(wx.EVT_BUTTON, self.on_cancel)
 
@@ -51,6 +53,7 @@ class AppFrame(wx.Frame):
 
         control.Add(self.browse_button, 0, wx.ALL, 5)
         control.Add(self.analysis_button, 0, wx.ALL, 5)
+        control.Add(self.generate_button, 0, wx.ALL, 5)
         control.Add(self.execute_button, 0, wx.ALL, 5)
         control.Add(self.cancel_button, 0, wx.ALL, 5)
 
@@ -61,6 +64,7 @@ class AppFrame(wx.Frame):
         wrapper.Fit(self)
 
         self.analysis_button.Disable()
+        self.generate_button.Disable()
         self.execute_button.Disable()
 
         self.CreateStatusBar()
@@ -106,24 +110,42 @@ class AppFrame(wx.Frame):
         self.set_image_path(filepath)
         self.analysis_button.Enable()
         self.execute_button.Disable()
+        self.generate_button.Disable()
         self.display.Refresh()
 
     def on_analysis(self, event):
         print "Analysis!"
         self.controller.process()
         self.output.Enable()
+        self.generate_button.Enable()
+
+    def on_generate(self, event):
+        print "Generate!"
+        self.code_output.SetValue(self.controller.generate())
         self.execute_button.Enable()
+        self.code_output.Enable()
 
     def on_execute(self, event):
         print "Execute!"
-        self.code_output.SetValue(self.controller.execute())
+        self.result_output.Clear()
+        self.result_output.SetValue(self.controller.execute(self.code_output.GetValue()))
+        self.result_output.Enable()
 
     def on_cancel(self, event):
         print "Cancel!"
         self.output.Clear()
+        self.code_output.Clear()
+        self.result_output.Clear()
+
         self.image_1.SetBitmap(wx.BitmapFromImage(wx.EmptyImage(400, 400)))
-        self.output.Disable()
         self.display.Refresh()
+
+        self.execute_button.Disable()
+        self.generate_button.Disable()
+
+        self.result_output.Disable()
+        self.code_output.Disable()
+        self.output.Disable()
 
     def set_controller(self, c):
         self.controller = c

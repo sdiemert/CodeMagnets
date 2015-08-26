@@ -2,6 +2,7 @@ __author__ = 'sdiemert'
 
 from ImageProcessor import CodeMagnetsImageProcessor
 from CodeGenerator import CodeGenerator
+from CodeRunner import CodeRunner
 
 class Controller:
 
@@ -12,6 +13,7 @@ class Controller:
         self.processor = CodeMagnetsImageProcessor()
         self.processor.train(readFromFile=True, path="data.csv")
         self.code_generator = CodeGenerator()
+        self.code_runner = CodeRunner()
 
     def set_view(self, v):
         self.view = v
@@ -31,8 +33,14 @@ class Controller:
 
         self._send_output(r)
 
-    def execute(self):
+    def generate(self):
         x = self.do_code_generation()
+        print "done generate()"
+        return x
+
+    def execute(self, code):
+        print "Controller.execute(): "+code
+        x = self.do_execute(code)
         print "done execute()"
         return x
 
@@ -50,3 +58,6 @@ class Controller:
 
     def do_code_generation(self):
         return self.code_generator.get_code(self.view.get_output_text())
+
+    def do_execute(self, c):
+        return self.code_runner.execute(c)
