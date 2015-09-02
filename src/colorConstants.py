@@ -69,7 +69,13 @@ def getColorFromId(i):
         return YELLOW 
 
     elif i == c.STOP:
-        return PINK 
-    
+        return PINK
+
+    elif i == c.ENDIF:
+        return YELLOW
+
+    elif i == c.MOD:
+        return BLUE
+
     else:
         return None

@@ -1,6 +1,14 @@
 __author__ = 'sdiemert'
 
+import sys
 import wx
+
+class RedirectText(object):
+    def __init__(self,aWxTextCtrl):
+        self.out=aWxTextCtrl
+
+    def write(self,string):
+        self.out.WriteText(string)
 
 
 class AppFrame(wx.Frame):
@@ -14,20 +22,32 @@ class AppFrame(wx.Frame):
 
         self.PhotoMaxSize = 500
 
-        self.SetMaxSize(wx.Size(900, 800))
+        self.SetMaxSize(wx.Size(1000, 800))
 
         wrapper = wx.BoxSizer(wx.VERTICAL)
         control = wx.BoxSizer(wx.HORIZONTAL)
         content = wx.BoxSizer(wx.HORIZONTAL)
 
         output_wrapper = wx.BoxSizer(wx.VERTICAL)
+        run_wrapper = wx.BoxSizer(wx.VERTICAL)
+        stdout_wrapper = wx.BoxSizer(wx.VERTICAL)
+        image_wrapper = wx.BoxSizer(wx.VERTICAL)
 
         img = wx.EmptyImage(400, 400)
 
         self.image_1 = wx.StaticBitmap(self.display, wx.ID_ANY, wx.BitmapFromImage(img))
-        self.output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 198), style=wx.TE_MULTILINE)
-        self.code_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 198), style=wx.TE_MULTILINE)
-        self.result_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(200, 400), style=wx.TE_MULTILINE)
+
+        self.output = wx.TextCtrl(self.display, wx.ID_ANY, size=(300, 198), style=wx.TE_MULTILINE)
+        self.code_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(300, 198), style=wx.TE_MULTILINE)
+        self.result_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(300, 198), style=wx.TE_MULTILINE)
+        self.error_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(300, 198), style=wx.TE_MULTILINE)
+
+        # Allow for stdout to display in the UI
+        # self.stdout_output = wx.TextCtrl(self.display, wx.ID_ANY, size=(900, 198), style=wx.TE_MULTILINE)
+        # self.redir=RedirectText(self.stdout_output)
+        # sys.stdout=self.redir
+        # self.stdout_output.Disable()
+
         self.browse_button = wx.Button(self.display, wx.ID_ANY, label="Browse for Image")
         self.analysis_button = wx.Button(self.display, wx.ID_ANY, label="Analyze Image")
         self.generate_button = wx.Button(self.display, wx.ID_ANY, label="Generate Code")
@@ -43,13 +63,21 @@ class AppFrame(wx.Frame):
         self.output.Disable()
         self.code_output.Disable()
         self.result_output.Disable()
+        self.error_output.Disable()
+
+        # stdout_wrapper.Add(self.stdout_output)
 
         output_wrapper.Add(self.output)
         output_wrapper.Add(self.code_output)
 
-        content.Add(self.image_1, 0, wx.ALL, 5)
+        run_wrapper.Add(self.result_output)
+        run_wrapper.Add(self.error_output)
+
+        image_wrapper.Add(self.image_1, 0, wx.ALL, 5)
+
+        content.Add(image_wrapper, 0, wx.ALL, 5)
         content.Add(output_wrapper, 0, wx.ALL, 5)
-        content.Add(self.result_output, 0, wx.ALL, 5)
+        content.Add(run_wrapper, 0, wx.ALL, 5)
 
         control.Add(self.browse_button, 0, wx.ALL, 5)
         control.Add(self.analysis_button, 0, wx.ALL, 5)
@@ -59,6 +87,7 @@ class AppFrame(wx.Frame):
 
         wrapper.Add(control, 0, wx.ALL, 5)
         wrapper.Add(content, 0, wx.ALL, 5)
+        wrapper.Add(stdout_wrapper, 0, wx.ALL, 5)
 
         self.display.SetSizer(wrapper)
         wrapper.Fit(self)
@@ -138,14 +167,27 @@ class AppFrame(wx.Frame):
     def on_execute(self, event):
         print "Execute!"
         self.result_output.Clear()
-        self.result_output.SetValue(self.controller.execute(self.code_output.GetValue()))
+        self.error_output.Clear()
+        result = self.controller.execute(self.code_output.GetValue())
+
+        print result
+
+        if result[1]:
+            self.result_output.SetValue("There was an error!\nSee the error printout below.")
+            self.error_output.SetValue(result[1])
+        else:
+            self.result_output.SetValue(result[0])
+            self.error_output.SetValue("No Errors...")
+
         self.result_output.Enable()
+        self.error_output.Enable()
 
     def on_cancel(self, event):
         print "Cancel!"
         self.output.Clear()
         self.code_output.Clear()
         self.result_output.Clear()
+        self.error_output.Clear()
 
         self.image_1.SetBitmap(wx.BitmapFromImage(wx.EmptyImage(400, 400)))
         self.display.Refresh()
@@ -154,6 +196,7 @@ class AppFrame(wx.Frame):
         self.generate_button.Disable()
 
         self.result_output.Disable()
+        self.error_output.Disable()
         self.code_output.Disable()
         self.output.Disable()
 

@@ -7,6 +7,7 @@ class CodeGenerator:
         pass
 
     def get_code(self, lines):
+
         print "CodeGenerator.get_code()"
         print lines
 
@@ -18,19 +19,14 @@ class CodeGenerator:
             if l:
                 x.append(l)
 
-        # make sure the program has a start and stop.
-
-        if x[0] != "START":
-            x[0] = "START"
-
-        if x[len(x) - 1] != "STOP":
-            x[len(x) - 1] = "STOP"
-
         depth = []
 
         for l in x:
 
-            s = self.get_statement(l, depth=len(depth))
+            try:
+                s = self.get_statement(l, depth=len(depth))
+            except:
+                continue
 
             if not s:
                 continue
@@ -72,6 +68,7 @@ class CodeGenerator:
         s = s.replace("mod", "%")
         s = s.replace("eequals", "==")
         s = s.replace("equals", "=")
+        s = s.replace("nequals", "=")
         s = s.replace("zero", "0")
         s = s.replace("one", "1")
         s = s.replace("two", "2")
@@ -79,13 +76,34 @@ class CodeGenerator:
 
         return s
 
+    def replace_symbols(self, s):
+        s = s.lower()
+        s = s.replace("plus", "+")
+        s = s.replace("minus", "-")
+        s = s.replace("lt", "<")
+        s = s.replace("gt", ">")
+        s = s.replace("mod", "%")
+        s = s.replace("eequals", "==")
+        s = s.replace("equals", "=")
+        s = s.replace("nequals", "!=")
+        s = s.replace("zero", "0")
+        s = s.replace("one", "1")
+        s = s.replace("two", "2")
+        s = s.replace("ten", "10")
+
+        return s.upper()
+
     def get_statement(self, statement, depth=0):
 
         s = statement.split(" ")
 
+        for v,i in zip(s, range(len(s))):
+            s[i] = v.strip().upper()
+            s[i] = self.replace_symbols(v)
+
         # check the first word of the statement
 
-        if s[0] == "VAR" and s[2] == "EQUALS":
+        if s[0] == "VAR" and (s[2] == '=' or s[2] == "EQUALS"):
             return Declaration(s[1], s[3], depth=depth)
 
         elif s[0] == "LOOP":
@@ -96,7 +114,7 @@ class CodeGenerator:
             if len(s) > 1:
                 return Print(s[1:], depth=depth)
 
-        elif (s[0] == "X" or s[0] == "Y") and s[1] == "EQUALS":
+        elif (s[0] == "X" or s[0] == "Y") and (s[1] == "EQUALS" or s[1] == "="):
             return Assignment(s[0], s[2:], depth=depth)
 
         elif s[0] == "IF":
@@ -105,6 +123,8 @@ class CodeGenerator:
         elif s[0] == "ENDLOOP" or s[0] == "ENDIF":
             return EndBlock(s[0])
 
+        else:
+            return None
 
 if __name__ == "__main__":
     s = "START\nVAR X EQUALS 0\nLOOP X LT 10\nIF X MOD 2 LT 0\nPRINT X\nENDIF\nX EQUALS X PLUS 1\nENDLOOP\nSTOP"

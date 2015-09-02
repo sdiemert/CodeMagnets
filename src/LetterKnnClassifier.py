@@ -7,7 +7,7 @@ from os.path import isfile, join
 from KnnClassifier import KnnClassifier
 import colorConstants as cc
 
-SEGMENTS = 20
+SEGMENTS = 12
 
 
 class LetterKnnClassifier(KnnClassifier):
@@ -20,8 +20,6 @@ class LetterKnnClassifier(KnnClassifier):
         path = "./training3/"
 
         fs = listdir(path)
-
-        # print fs
 
         for f in fs:
             s = f.split(".")
@@ -60,33 +58,17 @@ class LetterKnnClassifier(KnnClassifier):
 
     def getData(self, vals):
 
-        # plt.subplot(1,2,1)
-        # plt.imshow(vals)
         vals = cv2.fastNlMeansDenoisingColored(vals, None, 10, 10, 7, 21)
-        # plt.subplot(1,2,2)
-        # plt.imshow(vals)
-        # plt.show()
         bw = cv2.cvtColor(vals, cv2.COLOR_RGB2GRAY)
         vals = cv2.medianBlur(vals, 13)
         bw = cv2.adaptiveThreshold(bw, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 101, 0)
 
-        # plt.imshow(bw)
-        # plt.show()
-
-        # c = self.getColorDist(vals, show=False)
-        # s = self.getSideRatio(vals)
+        s = self.getSideRatio(bw)
         r = self.getRatio(bw)
         u = self.subDivideAndCalc(bw)
-
-        # print "color dist:", c,
-        # print "side ratio:", s,
-        # print "b/w ratio:", r
-
-        # x = c
-        # x += s
         x = r
+        x += s
         x += u
-        # print x
         return x
 
     def getSideRatio(self, vals):
@@ -144,4 +126,3 @@ class LetterKnnClassifier(KnnClassifier):
 
     def get_training_data(self):
         return self.train
-

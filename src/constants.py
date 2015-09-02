@@ -19,15 +19,16 @@ ENDLOOP = 17
 STOP = 18
 PRINT = 19
 ONE = 20
+ENDIF = 21
 
 
 def getConstantFromString(s):
-    s = s.lower() 
+    s = s.lower()
 
     if s == 'start':
         return START
     elif s == 'x':
-        return X 
+        return X
     elif s == 'var':
         return VAR
     elif s == 'equals':
@@ -66,8 +67,11 @@ def getConstantFromString(s):
         return STOP
     elif s == 'print':
         return PRINT
+    elif s == 'endif':
+        return ENDIF
     else:
         return None
+
 
 def getStringFromNumber(n):
     s = int(n)
@@ -75,23 +79,23 @@ def getStringFromNumber(n):
     if s == START:
         return "START"
     elif s == X:
-        return "X" 
+        return "X"
     elif s == VAR:
         return "VAR"
     elif s == EQUALS:
-        return "EQUALS" 
+        return "EQUALS"
     elif s == PLUS:
         return "PLUS"
-    elif s == ZERO :
+    elif s == ZERO:
         return "0"
-    elif s == TEN :
+    elif s == TEN:
         return "10"
-    elif s == TWO :
+    elif s == TWO:
         return "2"
-    elif s == ONE :
+    elif s == ONE:
         return "1"
     elif s == Y:
-        return "Y" 
+        return "Y"
     elif s == EEQUALS:
         return "EEQUALS"
     elif s == LT:
@@ -105,14 +109,16 @@ def getStringFromNumber(n):
     elif s == NEQUALS:
         return 'NEQUALS'
     elif s == IF:
-        return 'IF' 
+        return 'IF'
     elif s == ENDLOOP:
-        return 'ENDLOOP' 
+        return 'ENDLOOP'
     elif s == LOOP:
-        return 'LOOP' 
+        return 'LOOP'
     elif s == STOP:
-        return 'STOP' 
+        return 'STOP'
     elif s == PRINT:
-        return 'PRINT' 
+        return 'PRINT'
+    elif s == ENDIF:
+        return 'ENDIF'
     else:
         return None

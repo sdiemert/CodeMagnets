@@ -40,6 +40,10 @@ class Declaration(Statement):
 class Loop(Statement):
 
     def __init__(self, expr, depth=0):
+
+        if not expr:
+            expr = "True"
+
         Statement.__init__(self, expr, depth)
 
     def get_code(self):
@@ -51,6 +55,8 @@ class Loop(Statement):
 class Print(Statement):
 
     def __init__(self, expr, depth=0):
+        if not expr:
+            expr = "None"
         Statement.__init__(self, expr, depth)
 
     def get_code(self):
@@ -68,6 +74,8 @@ class Assignment(Statement):
 class If(Statement):
 
     def __init__(self, expr, depth=0):
+        if not expr:
+            expr = "True"
         Statement.__init__(self, expr, depth)
 
     def get_code(self):
