@@ -1,15 +1,11 @@
-from ShapeFinder import ShapeFinder
+import pprint
+from os import listdir
+
+from src.CodeMagnets import ShapeFinder
 from ColorKnnClassifier import ColorKnnClassifier
 from LetterKnnClassifier import LetterKnnClassifier
-import numpy as np
 import constants as const
-import colorConstants as cc
-
-import matplotlib.pyplot as plt
-import sys
-import pprint
-import colorConstants as cc
-from os import listdir
+import src.CodeMagnets.colorConstants as cc
 
 pp = pprint.PrettyPrinter(indent=4)
 

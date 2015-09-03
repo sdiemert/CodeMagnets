@@ -1,10 +1,11 @@
 __author__ = 'sdiemert'
 
+from os import listdir
+
 from ColorKnnClassifier import ColorKnnClassifier
 from LetterKnnClassifier import LetterKnnClassifier
-import constants as const
-import colorConstants as cc
-from os import listdir
+from src.CodeMagnets import constants as const
+import src.CodeMagnets.colorConstants as cc
 
 knn = ColorKnnClassifier()
 ratioKnns = []

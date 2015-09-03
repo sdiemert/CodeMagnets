@@ -1,17 +1,13 @@
 __author__ = 'sdiemert'
 
+import pprint
+from os import listdir
+
 from ShapeFinder import ShapeFinder
 from ColorKnnClassifier import ColorKnnClassifier
 from LetterKnnClassifier import LetterKnnClassifier
-import numpy as np
 import constants as const
 import colorConstants as cc
-
-import matplotlib.pyplot as plt
-import sys
-import pprint
-import colorConstants as cc
-from os import listdir
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -42,7 +38,7 @@ class CodeMagnetsImageProcessor:
 
             f.close()
 
-            f = open("color_data.csv", 'r')
+            f = open("../color_data.csv", 'r')
 
             for l in f:
                 l = l.split(',')

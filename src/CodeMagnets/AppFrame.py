@@ -1,6 +1,5 @@
 __author__ = 'sdiemert'
 
-import sys
 import wx
 
 class RedirectText(object):

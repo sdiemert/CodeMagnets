@@ -2,8 +2,8 @@ __author__ = 'sdiemert'
 
 import wx
 
-from AppFrame import AppFrame
-from Controller import Controller
+from CodeMagnets import AppFrame
+from CodeMagnets import Controller
 
 app = wx.App(False)
 

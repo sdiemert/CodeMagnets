@@ -1,9 +1,9 @@
-import numpy as np
-from matplotlib import pyplot as plt
-import cv2
-import constants as const
 from os import listdir
-from os.path import isfile, join
+
+import numpy as np
+import cv2
+
+import constants as const
 from KnnClassifier import KnnClassifier
 import colorConstants as cc
 
@@ -51,52 +51,23 @@ class ColorKnnClassifier(KnnClassifier):
     def getColorDist(self, image, show=False):
         r = []
         cs = ('b', 'g', 'r')
-        if show:
-            plt.figure()
-            plt.subplot(1,2,1)
 
         for i, col in enumerate(cs):
             hist = cv2.calcHist([image], [i], None, [256], [0,256])
-            if show:
-                plt.plot(hist, col)
-                plt.xlim([0,256])
             r.append(float(np.argmax(hist)))
 
-        if show:
-            plt.subplot(1,2,2)
-            plt.imshow(image)
-            plt.show()
-        return r 
+        return r
 
     def getData(self, vals):
         
-        #plt.subplot(1,2,1)
-        #plt.imshow(vals)
         vals = cv2.fastNlMeansDenoisingColored(vals,None,10,10,7,21)
-        #plt.subplot(1,2,2)
-        #plt.imshow(vals)
-        #plt.show()
         bw = cv2.cvtColor(vals, cv2.COLOR_RGB2GRAY)
         vals = cv2.medianBlur(vals, 13)
-        #bw = cv2.adaptiveThreshold(bw, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 101, 0)
-
-        #plt.imshow(bw)
-        #plt.show()
 
         c = self.getColorDist(vals, show=False)
-        #s = self.getSideRatio(vals)
-        #r = self.getRatio(bw)
-        #u = self.subDivideAndCalc(bw)
 
-        #print "color dist:", c, 
-        #print "side ratio:", s, 
-        #print "b/w ratio:", r, 
+        x = c
 
-        x = c  
-        #x += s 
-        #x += r 
-        #x += u 
-        #print x
         return x
 
     def getSideRatio(self, vals):

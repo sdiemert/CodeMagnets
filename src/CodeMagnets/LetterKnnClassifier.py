@@ -1,9 +1,9 @@
-import numpy as np
-from matplotlib import pyplot as plt
-import cv2
-import constants as const
 from os import listdir
-from os.path import isfile, join
+
+import numpy as np
+import cv2
+
+import constants as const
 from KnnClassifier import KnnClassifier
 import colorConstants as cc
 
@@ -107,21 +107,11 @@ class LetterKnnClassifier(KnnClassifier):
     def getColorDist(self, image, show=False):
         r = []
         cs = ('b', 'g', 'r')
-        if show:
-            plt.figure()
-            plt.subplot(1, 2, 1)
 
         for i, col in enumerate(cs):
             hist = cv2.calcHist([image], [i], None, [256], [0, 256])
-            if show:
-                plt.plot(hist, col)
-                plt.xlim([0, 256])
             r.append(float(np.argmax(hist)))
 
-        if show:
-            plt.subplot(1, 2, 2)
-            plt.imshow(image)
-            plt.show()
         return r
 
     def get_training_data(self):
