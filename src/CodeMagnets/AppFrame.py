@@ -153,6 +153,8 @@ class AppFrame(wx.Frame):
 
     def on_analysis(self, event):
         print "Analysis!"
+        self.analysis_button.Disable()
+        self.code_output.Clear()
         self.controller.process()
         self.output.Enable()
         self.generate_button.Enable()
@@ -193,6 +195,7 @@ class AppFrame(wx.Frame):
 
         self.execute_button.Disable()
         self.generate_button.Disable()
+        self.analysis_button.Enable()
 
         self.result_output.Disable()
         self.error_output.Disable()

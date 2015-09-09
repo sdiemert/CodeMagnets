@@ -1,6 +1,8 @@
 __author__ = 'sdiemert'
 
 import pprint
+import thread
+import threading
 from os import listdir
 
 from ShapeFinder import ShapeFinder
@@ -12,9 +14,32 @@ import colorConstants as cc
 pp = pprint.PrettyPrinter(indent=4)
 
 
+class WorkerThread(threading.Thread):
+
+    def __init__(self, row, col, sec, processor):
+        threading.Thread.__init__(self)
+        self.row = row
+        self.col = col
+        self.sec = sec
+        self.processor = processor
+
+    def run(self):
+        r = self.processor.knn.testFromImage(self.sec, show=False, seed=7)
+        print int(r[0]), cc.getColorFromNumber(r[0]),
+        v = self.processor.ratioKnns[int(r[0])].testFromImage(self.sec, show=False, seed=5)
+        x = const.getStringFromNumber(v[0])
+        print x, self.row, self.col
+        self.processor.lineLocks[self.row].acquire()
+        self.processor.output[self.row][self.col] = x
+        self.processor.lineLocks[self.row].release()
+
 class CodeMagnetsImageProcessor:
     def __init__(self):
-        pass
+        self.output = []
+        self.lineCount = 0
+        self.colCount = 0
+        self.threads = []
+        self.lineLocks = None
 
     def train(self, readFromFile=True, path="./training3/"):
         """
@@ -22,7 +47,6 @@ class CodeMagnetsImageProcessor:
         :return: True if the training succeeds, false otherwise.
         """
         self.knn = ColorKnnClassifier()
-
         self.ratioKnns = []
 
         for i in range(7):
@@ -38,7 +62,7 @@ class CodeMagnetsImageProcessor:
 
             f.close()
 
-            f = open("../color_data.csv", 'r')
+            f = open("color_data.csv", 'r')
 
             for l in f:
                 l = l.split(',')
@@ -84,27 +108,30 @@ class CodeMagnetsImageProcessor:
         c = sf.getShapeCoordinates(path, show=False)
         lines = sf.getShapesByLines(c)
 
-        output = []
-        count = 0
+        self.output = [[] for i in range(len(lines))]
+        self.lineLocks = [threading.Lock() for i in range(len(lines))]
+
+        self.lineCount = 0
+        self.threads = []
 
         for l in lines:
-            output.append([])
+            self.colCount = 0
             for s in l:
                 z = sf.getSection(s, color=True)
                 if z is not None:
-                    r = self.knn.testFromImage(z, show=False, seed=7)
-
-                    print int(r[0]), cc.getColorFromNumber(r[0]),
-
-                    v = self.ratioKnns[int(r[0])].testFromImage(z, show=False, seed=5)
-
-                    x = const.getStringFromNumber(v[0])
-                    output[count].append(x)
+                    self.output[self.lineCount].append('')
+                    t = WorkerThread(self.lineCount, self.colCount, z, self)
+                    t.start()
+                    self.threads.append(t)
+                    self.colCount += 1
 
             print ""
-            count += 1
+            self.lineCount += 1
+
+        for t in self.threads:
+            t.join()
 
         print "Done Image Processing"
         print "---------------------"
 
-        return output
+        return self.output
